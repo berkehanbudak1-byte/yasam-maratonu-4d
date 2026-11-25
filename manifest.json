@@ -1,0 +1,17 @@
+{
+  "name": "Yaşam Maratonu 4D — Web3 & $SISYPHOS",
+  "short_name": "Yaşam 4D",
+  "description": "4 Boyutlu Sisyphos RPG — Zaman, mevsimler, geçmiş benlik yankısı ve $SISYPHOS Play-to-Earn.",
+  "start_url": "./oyna.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#080d1a",
+  "theme_color": "#f5b942",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='24' fill='%23080d1a'/%3E%3Cpolygon points='64,18 110,104 18,104' fill='%23f5b942'/%3E%3Ccircle cx='64' cy='58' r='10' fill='%23080d1a'/%3E%3C/svg%3E",
+      "sizes": "128x128",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,236 +1,199 @@
 <!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-IsxUWUtPsZrCNMrOakehQj8LkebBOOA69GGcGPWxHs0='; style-src 'unsafe-inline'; connect-src 'self' https:; img-src 'self' data:;" />
-  <link rel="manifest" href="manifest.json" />
-  <title>Yaşam Maratonu 4D (v18) — Web3, $SISYPHOS, Multiplayer &amp; APK Portal</title>
-  <style>
-    :root { --bg:#080d1a; --card:#10182b; --border:#263554; --gold:#f5b942; --cyan:#38bdf8; --green:#34d399; --text:#e2e8f0; --muted:#94a3b8; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:"Segoe UI",system-ui,sans-serif; background:radial-gradient(circle at top right,#16233f 0%,var(--bg) 55%); color:var(--text); line-height:1.55; padding:24px; }
-    .wrap { max-width:1100px; margin:0 auto; }
-    .hero { background:linear-gradient(135deg,rgba(16,24,43,0.95),rgba(19,34,62,0.92)); border:1px solid var(--border); border-radius:18px; padding:26px; margin-bottom:20px; box-shadow:0 18px 40px rgba(0,0,0,0.4); }
-    .badge { display:inline-block; background:rgba(245,185,66,0.16); color:var(--gold); border:1px solid rgba(245,185,66,0.45); padding:4px 12px; border-radius:999px; font-size:12px; font-weight:700; }
-    h1 { margin:10px 0 8px; font-size:28px; color:#fff; }
-    p.sub { margin:0 0 18px; color:var(--muted); }
-    .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-    .btn { cursor:pointer; border:1px solid var(--border); background:#17243f; color:#fff; padding:10px 15px; border-radius:10px; font-weight:600; font-size:14px; text-decoration:none; }
-    .btn:hover { border-color:var(--cyan); }
-    .btn-gold { background:linear-gradient(135deg,#d97706,#f59e0b); color:#090d16; border:none; }
-    .btn-green { background:linear-gradient(135deg,#059669,#10b981); color:#04130d; border:none; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin-bottom:20px; }
-    .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; display:flex; flex-direction:column; justify-content:space-between; }
-    .card h2 { margin:0 0 6px; font-size:19px; color:var(--gold); }
-    .price { font-size:21px; font-weight:800; color:var(--cyan); margin:8px 0 12px; }
-    ul { margin:0 0 16px; padding-left:18px; color:var(--muted); font-size:14px; }
-    li { margin-bottom:6px; }
-    .box { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px; margin-bottom:18px; }
-    .row { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
-    input { flex:1 1 260px; background:#091020; border:1px solid var(--border); color:#fff; padding:11px 14px; border-radius:10px; font-family:Consolas,monospace; font-size:13px; }
-    .status { margin-top:12px; padding:12px 14px; border-radius:10px; background:#0a1326; border:1px solid #1e3154; font-size:13px; color:var(--green); word-break:break-word; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <section class="hero">
-      <span class="badge">YAŞAM MARATONU 4D · v18 MEGA WEB3, MULTIPLAYER &amp; APK</span>
-      <h1>Zirveye Tırman, $SISYPHOS Kazan &amp; Paylaşarak %15 ETH Al</h1>
-      <p class="sub">Bilgi Yarışması NPC'leri, Can Çeşmeleri, Definecilik Radarı, Balık/Maden/Ot Meslekleri, Canlı Çok Oyunculu Lobi ve SHA-256 Proof-of-Summit.</p>
-      <div class="toolbar">
-        <a href="./oyna.html" class="btn btn-green">TARAYICIDA / MOBİLDE HEMEN OYNA (v18 PWA)</a>
-        <button id="btnConnectWallet" class="btn btn-gold">MetaMask / EVM Cüzdan Bağla</button>
-        <button id="btnLangToggle" class="btn">EN / TR</button>
-        <span id="walletStatus" style="font-size:13px;color:#94a3b8;">Cüzdan bağlı değil (Misafir: 0x71C...89A2)</span>
-      </div>
-    </section>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>Yasam Maratonu 4D</title>
+		<style>
+html, body, #canvas {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
 
-    <section class="grid">
-      <article class="card">
-        <div>
-          <h2>1. Ücretsiz Oyna &amp; Kazan (PWA / APK / PC)</h2>
-          <div class="price">$0 · Play-to-Earn + Multi</div>
-          <ul>
-            <li>Bilgi NPC'leri (+35 $SISY), Can Çeşmeleri (+15) &amp; Define Kazı (+85..140)</li>
-            <li>Balıkçılık, Madencilik, Şifalı Otçuluk &amp; Yan Görevler</li>
-            <li>Çok Oyunculu Dağ Lobisi + günlük %8 Stake getirisi</li>
-            <li>Itch.io HTML5 + Android APK &amp; Win64 tam paket</li>
-          </ul>
-        </div>
-        <button id="btnDownloadInfo" class="btn btn-green">APK &amp; Itch.io Dağıtım Bilgisi</button>
-      </article>
+body {
+	color: white;
+	background-color: black;
+	overflow: hidden;
+	touch-action: none;
+}
 
-      <article class="card">
-        <div>
-          <h2>2. VIP Sezon Bileti &amp; Zirve NFT</h2>
-          <div class="price">0.0015 ETH / MATIC ($4.99)</div>
-          <ul>
-            <li>Kalıcı <b>2x $SISYPHOS</b> madencilik &amp; bilgi ödülü çarpanı</li>
-            <li>Oyun içi kalıcı <b>+2 ATK &amp; +2 DEF</b> savaş gücü</li>
-            <li>Anında <b>500 $SISY</b> on-chain + <code>YM4DVIP</code> anahtarı</li>
-            <li><code>buyVipWithReferral()</code> ile davet edenlere %15 anlık ETH/MATIC</li>
-          </ul>
-        </div>
-        <button id="btnBuyVip" class="btn btn-gold">VIP Bileti Kontratı ile Al</button>
-      </article>
+#canvas {
+	display: block;
+}
 
-      <article class="card">
-        <div>
-          <h2>3. Kurucu Paketi &amp; Kaynak Lisansı</h2>
-          <div class="price">0.0045 ETH / MATIC ($14.99)</div>
-          <ul>
-            <li>Tam Godot 4.3 kaynak kodu + Android/Windows/Web presetleri</li>
-            <li><b>5.000 $SISYPHOS</b> Kurucu token tahsisi</li>
-            <li>Kendi marka ve token kontratınla yeniden yayınlama hakkı</li>
-            <li>Doğrudan <code>SisyphosToken.buyFounderPack()</code> kontratı</li>
-          </ul>
-        </div>
-        <button id="btnBuyFounder" class="btn">Kurucu Paketi Al</button>
-      </article>
-    </section>
+#canvas:focus {
+	outline: none;
+}
 
-    <section class="box">
-      <h2 style="margin:0 0 6px;color:#f5b942;">Viral Referans &amp; Paylaş-Kazan (%15 Kripto Komisyonu)</h2>
-      <p style="margin:0;color:#94a3b8;font-size:14px;">EVM cüzdan adresinle referans linki üret. Arkadaşın VIP aldığında <code>SisyphosToken.buyVipWithReferral()</code> ödemenin <b>%15'ini anında sana</b> + <b>100 $SISY</b> gönderir.</p>
-      <div class="row">
-        <input id="refWalletInput" type="text" value="0x71C...89A2" placeholder="EVM cüzdan adresin (0x...)" />
-        <button id="btnGenRef" class="btn btn-gold">Referans Linki Üret &amp; Kopyala</button>
-        <button id="btnShareX" class="btn">X'te Paylaş</button>
-        <button id="btnShareTg" class="btn">Telegram'da Paylaş</button>
-      </div>
-      <div id="refResult" class="status">Henüz referans linki üretilmedi.</div>
-    </section>
+#status, #status-splash, #status-progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
 
-    <section class="box">
-      <h2 style="margin:0 0 6px;color:#38bdf8;">Proof-of-Summit (Zirve Kanıtı) SHA-256 Doğrulayıcı</h2>
-      <p style="margin:0;color:#94a3b8;font-size:14px;">Oyun içinde <b>[K]</b> tuşu veya <b>$SISY</b> butonuyla ürettiğin <code>YM4D-CLAIM-...</code> kodunu aşağıya yapıştır. Tarayıcı <code>window.crypto.subtle</code> ile SHA-256 imzasını anında doğrular.</p>
-      <div class="row">
-        <input id="claimCodeInput" type="text" placeholder="YM4D-CLAIM-1Z-LV3-175S-200M-A1B2C3D4E5F6" />
-        <input id="claimWalletInput" type="text" value="0x71C...89A2" placeholder="Oyun içi cüzdan etiketi" />
-        <button id="btnVerifyClaim" class="btn btn-green">SHA-256 Doğrula</button>
-      </div>
-      <div id="claimResult" class="status">Doğrulama bekleniyor.</div>
-    </section>
-  </div>
+#status, #status-splash {
+	top: 0;
+	bottom: 0;
+}
 
-  <script>
-    (function () {
-      "use strict";
-      let connectedAccount = null;
-      let isEnglish = false;
-      let lastRefUrl = new URL("oyna.html", window.location.href).href;
+#status {
+	background-color: #242424;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	visibility: hidden;
+}
 
-      const elWalletStatus = document.getElementById("walletStatus");
-      const elClaimResult = document.getElementById("claimResult");
-      const elClaimCode = document.getElementById("claimCodeInput");
-      const elClaimWallet = document.getElementById("claimWalletInput");
-      const elRefInput = document.getElementById("refWalletInput");
-      const elRefResult = document.getElementById("refResult");
+#status-splash {
+	max-height: 100%;
+	max-width: 100%;
+	margin: auto;
+}
 
-      function setStatus(el, msg, ok) {
-        el.textContent = msg;
-        el.style.color = ok ? "#34d399" : "#f87171";
-      }
+#status-progress, #status-notice {
+	display: none;
+}
 
-      document.getElementById("btnConnectWallet").addEventListener("click", async function () {
-        if (!window.ethereum) {
-          setStatus(elClaimResult, "MetaMask veya Rabby bulunamadı. Misafir cüzdan veya Remix ile devam edebilirsiniz.", false);
-          return;
-        }
-        try {
-          const accs = await window.ethereum.request({ method: "eth_requestAccounts" });
-          connectedAccount = accs[0];
-          elWalletStatus.textContent = "Bağlı Cüzdan: " + connectedAccount;
-          elWalletStatus.style.color = "#34d399";
-          elRefInput.value = connectedAccount;
-        } catch (err) {
-          setStatus(elClaimResult, "Cüzdan bağlantısı iptal edildi: " + (err && err.message ? err.message : err), false);
-        }
-      });
+#status-progress {
+	bottom: 10%;
+	width: 50%;
+	margin: 0 auto;
+}
 
-      document.getElementById("btnDownloadInfo").addEventListener("click", function () {
-        setStatus(
-          elClaimResult,
-          "HTML5 Itch.io zipi: YAYIN_PAKETI/Yasam_Maratonu_4D_v17_HTML5_Itchio.zip | Tam kaynak & Web3 paketi: Yasam_Maratonu_4D_v17_Web3_Publish.zip",
-          true
-        );
-      });
+#status-notice {
+	background-color: #5b3943;
+	border-radius: 0.5rem;
+	border: 1px solid #9b3943;
+	color: #e0e0e0;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
+	line-height: 1.3;
+	margin: 0 2rem;
+	overflow: hidden;
+	padding: 1rem;
+	text-align: center;
+	z-index: 1;
+}
+		</style>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
+<link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 
-      document.getElementById("btnBuyVip").addEventListener("click", function () {
-        const who = connectedAccount || "Cüzdan bağlayın";
-        setStatus(
-          elClaimResult,
-          "VIP Sezon Bileti (0.0015 ETH/MATIC): SisyphosToken.buyVipSeasonPass() veya buyVipWithReferral(referrer) ile %15 referans komisyonu aktif. Hesap: " + who,
-          true
-        );
-      });
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
 
-      document.getElementById("btnBuyFounder").addEventListener("click", function () {
-        const who = connectedAccount || "Cüzdan bağlayın";
-        setStatus(
-          elClaimResult,
-          "Kurucu Paketi (0.0045 ETH/MATIC): SisyphosToken.buyFounderPack() çağrısı ile 5.000 $SISY tahsis edilir. Aktif hesap: " + who,
-          true
-        );
-      });
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
 
-      document.getElementById("btnGenRef").addEventListener("click", async function () {
-        const w = (elRefInput.value || "guest").replace(/[^a-zA-Z0-9._-]/g, "") || "guest";
-        lastRefUrl = new URL("oyna.html?ref=" + encodeURIComponent(w), window.location.href).href;
-        try { await navigator.clipboard.writeText(lastRefUrl); } catch (_) {}
-        setStatus(elRefResult, "Referans linkin hazır ve panoya kopyalandı (%15 komisyon): " + lastRefUrl, true);
-      });
+		<div id="status">
+			<img id="status-splash" src="index.png" alt="">
+			<progress id="status-progress"></progress>
+			<div id="status-notice"></div>
+		</div>
 
-      document.getElementById("btnShareX").addEventListener("click", function () {
-        const txt = "Yaşam Maratonu 4D v18'de zirveye tırmanıp $SISYPHOS kazanıyorum! Tarayıcıdan hemen oyna:";
-        window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(txt) + "&url=" + encodeURIComponent(lastRefUrl), "_blank", "noopener,noreferrer");
-      });
+		<script src="index.js"></script>
+		<script>
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":216064,"index.wasm":35376909},"focusCanvas":true,"gdextensionLibs":[]};
+const GODOT_THREADS_ENABLED = false;
+const engine = new Engine(GODOT_CONFIG);
 
-      document.getElementById("btnShareTg").addEventListener("click", function () {
-        const txt = "Yaşam Maratonu 4D v18 — Web3, Definecilik, Bilgi Yarışması & Multiplayer!";
-        window.open("https://t.me/share/url?url=" + encodeURIComponent(lastRefUrl) + "&text=" + encodeURIComponent(txt), "_blank", "noopener,noreferrer");
-      });
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
 
-      document.getElementById("btnVerifyClaim").addEventListener("click", async function () {
-        const code = (elClaimCode.value || "").trim();
-        const wallet = (elClaimWallet.value || "0x71C...89A2").trim();
-        const m = /^YM4D-CLAIM-(\d+)Z-LV(\d+)-(\d+)S-(\d+)M-([0-9A-Fa-f]{12})$/.exec(code);
-        if (!m) {
-          setStatus(elClaimResult, "Geçersiz Zirve Kanıtı formatı. Beklenen: YM4D-CLAIM-<cycle>Z-LV<lvl>-<sisy>S-<mined>M-<HMAC12>", false);
-          return;
-        }
-        try {
-          const resp = await fetch("/api/verify-claim", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code, wallet })
-          });
-          const data = await resp.json();
-          if (!resp.ok || !data.ok) {
-            setStatus(elClaimResult, "HMAC-SHA256 doğrulaması başarısız: " + (data.error || "Kod veya cüzdan eşleşmedi."), false);
-            return;
-          }
-          const c = data.claim;
-          setStatus(
-            elClaimResult,
-            "GEÇERLİ PROOF-OF-SUMMIT! Zirve Döngüsü: " + c.cycle + " | Seviye: " + c.level + " | Hak Edilen: " + c.redeemable_sisy + " $SISYPHOS (Toplam Kazılan: " + c.total_mined + ")",
-            true
-          );
-        } catch (_) {
-          setStatus(elClaimResult, "Portal sunucusuna bağlanılamadı (" + window.location.origin + ").", false);
-        }
-      });
+	let initializing = true;
+	let statusMode = '';
 
-      document.getElementById("btnLangToggle").addEventListener("click", function () {
-        isEnglish = !isEnglish;
-        document.querySelector("h1").textContent = isEnglish
-          ? "Climb the Summit, Mine $SISYPHOS & Earn 15% Referral ETH"
-          : "Zirveye Tırman, $SISYPHOS Kazan & Paylaşarak %15 ETH Al";
-        document.getElementById("btnConnectWallet").textContent = isEnglish ? "Connect MetaMask / EVM Wallet" : "MetaMask / EVM Cüzdan Bağla";
-        document.getElementById("btnVerifyClaim").textContent = isEnglish ? "Verify SHA-256 Claim" : "SHA-256 Doğrula";
-      });
-    })();
-  </script>
-</body>
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) {
+			return;
+		}
+		if (mode === 'hidden') {
+			statusOverlay.remove();
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
+
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) {
+			statusNotice.removeChild(statusNotice.lastChild);
+		}
+		const lines = text.split('\n');
+		lines.forEach((line) => {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+		if (err instanceof Error) {
+			setStatusNotice(err.message);
+		} else if (typeof err === 'string') {
+			setStatusNotice(err);
+		} else {
+			setStatusNotice('An unknown error occured');
+		}
+		setStatusMode('notice');
+		initializing = false;
+	}
+
+	const missing = Engine.getMissingFeatures({
+		threads: GODOT_THREADS_ENABLED,
+	});
+
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			// There's a chance that installing the service worker would fix the issue
+			Promise.race([
+				navigator.serviceWorker.getRegistration().then((registration) => {
+					if (registration != null) {
+						return Promise.reject(new Error('Service worker already exists.'));
+					}
+					return registration;
+				}).then(() => engine.installServiceWorker()),
+				// For some reason, `getRegistration()` can stall
+				new Promise((resolve) => {
+					setTimeout(() => resolve(), 2000);
+				}),
+			]).catch((err) => {
+				console.error('Error while registering service worker:', err);
+			}).then(() => {
+				window.location.reload();
+			});
+		} else {
+			// Display the message as usual
+			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			displayFailureNotice(missingMsg + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		engine.startGame({
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		}).then(() => {
+			setStatusMode('hidden');
+		}, displayFailureNotice);
+	}
+}());
+		</script>
+	</body>
 </html>
+

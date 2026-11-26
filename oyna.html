@@ -2,13 +2,228 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=./" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Yaşam Maratonu 4D — Godot 3D Web</title>
-  <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#080d1a;color:#e2e8f0;font-family:system-ui,sans-serif}a{color:#f5b942;font-weight:700}</style>
-  <script>window.location.replace("./" + window.location.search + window.location.hash);</script>
+  <title>Yaşam Maratonu 4D — Hızlı Başlat / Quick Launch</title>
+  <style>
+    :root {
+      --bg: #080d1a;
+      --card: rgba(15, 23, 42, 0.88);
+      --border: rgba(245, 185, 66, 0.35);
+      --gold: #f5b942;
+      --gold-hover: #ffd166;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 1.25rem;
+      background: radial-gradient(circle at 50% 20%, #162447 0%, var(--bg) 70%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .launch-card {
+      width: min(680px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(12px);
+    }
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+    .badge {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.14);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    h1 {
+      margin: 0.25rem 0 0.5rem;
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      color: var(--gold);
+    }
+    .subtitle {
+      margin: 0 0 1.5rem;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 1.6rem;
+    }
+    .ctrl-box {
+      background: rgba(8, 13, 26, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 0.9rem 1rem;
+    }
+    .ctrl-box h3 {
+      margin: 0 0 0.4rem;
+      font-size: 0.9rem;
+      color: var(--accent);
+    }
+    .ctrl-box p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.45;
+    }
+    kbd {
+      display: inline-block;
+      padding: 0.12rem 0.42rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(245, 185, 66, 0.14);
+      border: 1px solid rgba(245, 185, 66, 0.4);
+      border-radius: 6px;
+      font-family: monospace;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .btn-play {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.6rem;
+      border-radius: 12px;
+      background: var(--gold);
+      color: #080d1a;
+      font-weight: 800;
+      font-size: 1rem;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .btn-play:hover {
+      background: var(--gold-hover);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn-secondary:hover {
+      color: var(--text);
+      border-color: var(--text);
+    }
+    .timer-note {
+      margin-top: 1rem;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+  </style>
 </head>
 <body>
-  <p><a href="./">Yaşam Maratonu 4D (Godot 3D WebAssembly) başlatılıyor...</a></p>
+  <main class="launch-card">
+    <div class="badge-row">
+      <span class="badge">Godot 4.3 · 3D/4D WebAssembly</span>
+      <span class="badge">TR / EN</span>
+    </div>
+    <h1>Yaşam Maratonu 4D</h1>
+    <p class="subtitle">
+      4 Boyutlu Yaşam ve Zaman Maratonu Simülasyonu · 4D Life &amp; Time Marathon Simulation
+    </p>
+
+    <section class="controls-grid" aria-label="Kontroller / Controls">
+      <div class="ctrl-box">
+        <h3>Hareket / Movement</h3>
+        <p><kbd>WASD</kbd> veya <kbd>Ok Tuşları</kbd> ile şerit ve yön kontrolü · Lane &amp; directional steering</p>
+      </div>
+      <div class="ctrl-box">
+        <h3>4D Zaman &amp; Boyut Geçişi</h3>
+        <p><kbd>Space</kbd> / <kbd>E</kbd> / <kbd>Q</kbd> ile zıplama ve 4D zaman-boyut faz geçişi · 4D dimension phase shift</p>
+      </div>
+      <div class="ctrl-box">
+        <h3>Dokunmatik &amp; Mobil / Touch</h3>
+        <p>Ekran üstü sanal kontroller ve kaydırma hareketleri desteklenir · On-screen touch &amp; swipe ready</p>
+      </div>
+      <div class="ctrl-box">
+        <h3>Kamera &amp; Duraklat / System</h3>
+        <p><kbd>C</kbd> Kamera açısı · <kbd>Esc</kbd> / <kbd>P</kbd> Duraklatma menüsü (Pause menu)</p>
+      </div>
+    </section>
+
+    <div class="actions">
+      <a id="playNow" class="btn-play" href="./">▶ Hemen Oyna / Play Now</a>
+      <button id="toggleTimer" type="button" class="btn-secondary">Otomatik Başlatmayı Durdur / Pause Auto-Launch</button>
+    </div>
+    <p id="timerText" class="timer-note">
+      Oyun <strong id="countdown">3</strong> saniye içinde otomatik başlatılıyor... (Redirecting to WebAssembly engine)
+    </p>
+  </main>
+
+  <script>
+    (function () {
+      const target = "./" + window.location.search + window.location.hash;
+      const playBtn = document.getElementById("playNow");
+      const toggleBtn = document.getElementById("toggleTimer");
+      const countEl = document.getElementById("countdown");
+      const timerText = document.getElementById("timerText");
+      playBtn.setAttribute("href", target);
+
+      const params = new URLSearchParams(window.location.search);
+      let paused = params.get("stay") === "1";
+      let remaining = 3;
+
+      function launch() {
+        window.location.replace(target);
+      }
+
+      const interval = setInterval(function () {
+        if (paused) return;
+        remaining -= 1;
+        if (countEl) countEl.textContent = String(Math.max(0, remaining));
+        if (remaining <= 0) {
+          clearInterval(interval);
+          launch();
+        }
+      }, 1000);
+
+      toggleBtn.addEventListener("click", function () {
+        paused = !paused;
+        if (paused) {
+          timerText.textContent = "Otomatik başlatma duraklatıldı. Hazır olduğunuzda 'Hemen Oyna' düğmesine basın.";
+          toggleBtn.textContent = "Sayacı Devam Ettir / Resume Auto-Launch";
+        } else {
+          remaining = 3;
+          timerText.innerHTML = 'Oyun <strong id="countdown">3</strong> saniye içinde otomatik başlatılıyor...';
+          toggleBtn.textContent = "Otomatik Başlatmayı Durdur / Pause Auto-Launch";
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

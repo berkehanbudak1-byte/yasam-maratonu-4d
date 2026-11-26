@@ -192,6 +192,111 @@
       border-color: rgba(248, 113, 113, 0.45);
       background: rgba(127, 29, 29, 0.28);
     }
+    .panel-box {
+      background: rgba(8, 13, 26, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.6rem;
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.65rem;
+    }
+    .profile-btn {
+      text-align: left;
+      padding: 0.7rem 0.9rem;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .profile-btn:hover {
+      border-color: var(--accent);
+    }
+    .profile-btn.active {
+      border-color: var(--gold);
+      background: rgba(245, 185, 66, 0.14);
+      box-shadow: 0 0 0 1px rgba(245, 185, 66, 0.35);
+    }
+    .profile-btn strong {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--gold);
+      margin-bottom: 0.2rem;
+    }
+    .profile-btn span {
+      display: block;
+      font-size: 0.76rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .profile-hint {
+      margin: 0.55rem 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .tools-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 0.75rem;
+      align-items: center;
+    }
+    .btn-mini {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      padding: 0.42rem 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .btn-mini:hover {
+      border-color: var(--accent);
+    }
+    .btn-danger {
+      border-color: rgba(248, 113, 113, 0.45);
+      color: #fca5a5;
+    }
+    .btn-danger:hover {
+      border-color: #f87171;
+      background: rgba(127, 29, 29, 0.32);
+    }
+    .confirm-bar {
+      display: none;
+      margin-top: 0.65rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 9px;
+      border: 1px solid rgba(248, 113, 113, 0.45);
+      background: rgba(127, 29, 29, 0.25);
+      font-size: 0.79rem;
+      color: #fecaca;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .confirm-bar.open {
+      display: flex;
+    }
+    .status-line {
+      margin: 0.55rem 0 0;
+      font-size: 0.78rem;
+      color: var(--accent);
+      min-height: 1.1em;
+    }
   </style>
 </head>
 <body>
@@ -213,6 +318,47 @@
         <span class="diag-chip" id="diagAudio">Audio: Kontrol ediliyor...</span>
       </div>
     </div>
+
+    <section class="panel-box" id="profileSelector" aria-label="Başlatma Profili / Launch Profile">
+      <div class="panel-head">
+        <span class="diag-title">Başlatma Profili / Launch Profile</span>
+        <span class="diag-chip ok" id="profileBadge">Profil: Desktop 4D</span>
+      </div>
+      <div class="profile-grid">
+        <button type="button" class="profile-btn" id="profileDesktop" data-profile="desktop" aria-pressed="true">
+          <strong>Desktop 4D</strong>
+          <span>Tam 4D gölgelendirici, WASD/Fare kontrolü ve yüksek çözünürlük</span>
+        </button>
+        <button type="button" class="profile-btn" id="profileTouch" data-profile="touch" aria-pressed="false">
+          <strong>Touch-Optimized</strong>
+          <span>Dokunmatik sanal pad, kaydırma ve mobil pil/DPR optimizasyonu</span>
+        </button>
+      </div>
+      <p class="profile-hint" id="profileHint">Seçilen profil URL parametresi ve tarayıcı tercihi olarak saklanır.</p>
+    </section>
+
+    <section class="panel-box" id="telemetryPanel" aria-label="Kayıt Verisi Telemetrisi ve Güvenli Sıfırlama">
+      <div class="panel-head">
+        <span class="diag-title">Kayıt Verisi Telemetrisi / Save-Data Inspector</span>
+        <button type="button" class="btn-mini" id="refreshTelemetry">Yenile / Refresh</button>
+      </div>
+      <div class="diag-chips" id="telemetryChips">
+        <span class="diag-chip" id="telIdb">IndexedDB (/userfs): Taranıyor...</span>
+        <span class="diag-chip" id="telQuota">Kota / Quota: Taranıyor...</span>
+        <span class="diag-chip" id="telCache">Asset Cache: Taranıyor...</span>
+        <span class="diag-chip" id="telLocal">LocalStorage: Taranıyor...</span>
+      </div>
+      <div class="tools-row">
+        <button type="button" class="btn-mini" id="clearCacheBtn">Önbelleği Temizle / Clear Asset Cache (Safe)</button>
+        <button type="button" class="btn-mini btn-danger" id="resetSaveBtn">Kayıt Verisini Sıfırla / Reset Save Data</button>
+      </div>
+      <div class="confirm-bar" id="saveResetConfirm" role="alert">
+        <span>Dikkat: Godot <code>/userfs</code> kayıt dosyaları kalıcı olarak silinecek. Emin misiniz?</span>
+        <button type="button" class="btn-mini btn-danger" id="confirmResetSaveBtn">Evet, Kaydı Sil / Confirm</button>
+        <button type="button" class="btn-mini" id="cancelResetSaveBtn">İptal / Cancel</button>
+      </div>
+      <p class="status-line" id="resetStatus" aria-live="polite"></p>
+    </section>
 
     <section class="controls-grid" aria-label="Kontroller / Controls">
       <div class="ctrl-box">
@@ -244,16 +390,80 @@
 
   <script>
     (function () {
-      const target = "./" + window.location.search + window.location.hash;
+      const PROFILE_KEY = "ym4d_launch_profile";
       const playBtn = document.getElementById("playNow");
       const toggleBtn = document.getElementById("toggleTimer");
-      const countEl = document.getElementById("countdown");
       const timerText = document.getElementById("timerText");
-      playBtn.setAttribute("href", target);
+      const profileDesktopBtn = document.getElementById("profileDesktop");
+      const profileTouchBtn = document.getElementById("profileTouch");
+      const profileBadge = document.getElementById("profileBadge");
+      const profileHint = document.getElementById("profileHint");
 
       const params = new URLSearchParams(window.location.search);
       let paused = params.get("stay") === "1";
       let remaining = 3;
+
+      function detectDefaultProfile() {
+        const q = (params.get("profile") || "").toLowerCase();
+        if (q === "desktop" || q === "touch") return q;
+        try {
+          const saved = (localStorage.getItem(PROFILE_KEY) || "").toLowerCase();
+          if (saved === "desktop" || saved === "touch") return saved;
+        } catch (e) {}
+        const isCoarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+        return isCoarse ? "touch" : "desktop";
+      }
+
+      let activeProfile = detectDefaultProfile();
+
+      function buildTargetUrl() {
+        const p = new URLSearchParams(window.location.search);
+        p.set("profile", activeProfile);
+        p.set("touch", activeProfile === "touch" ? "1" : "0");
+        const qs = p.toString();
+        return "./" + (qs ? "?" + qs : "") + window.location.hash;
+      }
+
+      function applyProfile(profile, userTriggered) {
+        activeProfile = profile === "touch" ? "touch" : "desktop";
+        try {
+          localStorage.setItem(PROFILE_KEY, activeProfile);
+        } catch (e) {}
+        if (profileDesktopBtn) {
+          const isDesk = activeProfile === "desktop";
+          profileDesktopBtn.classList.toggle("active", isDesk);
+          profileDesktopBtn.setAttribute("aria-pressed", String(isDesk));
+        }
+        if (profileTouchBtn) {
+          const isTouch = activeProfile === "touch";
+          profileTouchBtn.classList.toggle("active", isTouch);
+          profileTouchBtn.setAttribute("aria-pressed", String(isTouch));
+        }
+        if (profileBadge) {
+          profileBadge.textContent = activeProfile === "touch" ? "Profil: Touch-Optimized" : "Profil: Desktop 4D";
+        }
+        if (profileHint) {
+          profileHint.textContent =
+            activeProfile === "touch"
+              ? "Aktif profil: Touch-Optimized (?profile=touch&touch=1 — mobil dokunmatik kontroller etkin)."
+              : "Aktif profil: Desktop 4D (?profile=desktop&touch=0 — tam 4D masaüstü görünümü etkin).";
+        }
+        if (playBtn) playBtn.setAttribute("href", buildTargetUrl());
+        if (userTriggered) {
+          pauseCountdown("Başlatma profili güncellendi. Hazır olduğunuzda 'Hemen Oyna' düğmesine basın.");
+          inspectSaveTelemetry();
+        }
+      }
+
+      function pauseCountdown(reason) {
+        paused = true;
+        if (timerText) {
+          timerText.textContent = reason || "Otomatik başlatma duraklatıldı. Hazır olduğunuzda 'Hemen Oyna' düğmesine basın.";
+        }
+        if (toggleBtn) {
+          toggleBtn.textContent = "Sayacı Devam Ettir / Resume Auto-Launch";
+        }
+      }
 
       function runDeviceDiagnostics() {
         const webglEl = document.getElementById("diagWebgl");
@@ -298,26 +508,277 @@
         }
 
         if (!hasWebgl2) {
-          paused = true;
-          if (timerText) {
-            timerText.textContent = "Uyarı: Tarayıcınızda WebGL2 desteği algılanamadı. Otomatik başlatma duraklatıldı.";
+          pauseCountdown("Uyarı: Tarayıcınızda WebGL2 desteği algılanamadı. Otomatik başlatma duraklatıldı.");
+        }
+      }
+
+      function formatBytes(bytes) {
+        const n = Number(bytes || 0);
+        if (n < 1024) return n + " B";
+        if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+        return (n / (1024 * 1024)).toFixed(2) + " MB";
+      }
+
+      function readIdbSaveStats() {
+        return new Promise(function (resolve) {
+          if (!window.indexedDB) {
+            resolve({ supported: false, entries: 0, bytes: 0, dbNames: [] });
+            return;
           }
-          if (toggleBtn) {
-            toggleBtn.textContent = "Sayacı Devam Ettir / Resume Auto-Launch";
+          const checkDb = function (dbName) {
+            return new Promise(function (resDb) {
+              try {
+                const req = indexedDB.open(dbName);
+                let createdNew = false;
+                req.onupgradeneeded = function () {
+                  createdNew = true;
+                };
+                req.onerror = function () {
+                  resDb({ entries: 0, bytes: 0 });
+                };
+                req.onsuccess = function () {
+                  const db = req.result;
+                  if (createdNew || !db.objectStoreNames.contains("FILE_DATA")) {
+                    db.close();
+                    if (createdNew) {
+                      try { indexedDB.deleteDatabase(dbName); } catch (e) {}
+                    }
+                    resDb({ entries: 0, bytes: 0 });
+                    return;
+                  }
+                  try {
+                    const tx = db.transaction("FILE_DATA", "readonly");
+                    const store = tx.objectStore("FILE_DATA");
+                    const allReq = store.getAll();
+                    allReq.onsuccess = function () {
+                      const items = allReq.result || [];
+                      let bytes = 0;
+                      for (let i = 0; i < items.length; i += 1) {
+                        const it = items[i];
+                        if (it && it.contents && it.contents.byteLength) bytes += it.contents.byteLength;
+                      }
+                      db.close();
+                      resDb({ entries: items.length, bytes: bytes });
+                    };
+                    allReq.onerror = function () {
+                      db.close();
+                      resDb({ entries: 0, bytes: 0 });
+                    };
+                  } catch (e) {
+                    db.close();
+                    resDb({ entries: 0, bytes: 0 });
+                  }
+                };
+              } catch (e) {
+                resDb({ entries: 0, bytes: 0 });
+              }
+            });
+          };
+
+          if (typeof indexedDB.databases === "function") {
+            indexedDB.databases().then(function (dbs) {
+              const names = (dbs || []).map(function (d) { return d && d.name; }).filter(Boolean);
+              if (!names.includes("/userfs")) {
+                resolve({ supported: true, entries: 0, bytes: 0, dbNames: names });
+                return;
+              }
+              checkDb("/userfs").then(function (st) {
+                resolve({ supported: true, entries: st.entries, bytes: st.bytes, dbNames: names });
+              });
+            }).catch(function () {
+              checkDb("/userfs").then(function (st) {
+                resolve({ supported: true, entries: st.entries, bytes: st.bytes, dbNames: st.entries ? ["/userfs"] : [] });
+              });
+            });
+          } else {
+            checkDb("/userfs").then(function (st) {
+              resolve({ supported: true, entries: st.entries, bytes: st.bytes, dbNames: st.entries ? ["/userfs"] : [] });
+            });
+          }
+        });
+      }
+
+      async function inspectSaveTelemetry() {
+        const idbEl = document.getElementById("telIdb");
+        const quotaEl = document.getElementById("telQuota");
+        const cacheEl = document.getElementById("telCache");
+        const localEl = document.getElementById("telLocal");
+
+        const idbStats = await readIdbSaveStats();
+        if (idbEl) {
+          if (!idbStats.supported) {
+            idbEl.textContent = "IndexedDB: Desteklenmiyor";
+            idbEl.className = "diag-chip warn";
+          } else if (idbStats.entries > 0) {
+            idbEl.textContent = "Save (/userfs): " + idbStats.entries + " dosya (" + formatBytes(idbStats.bytes) + ")";
+            idbEl.className = "diag-chip ok";
+          } else {
+            idbEl.textContent = "Save (/userfs): Boş / Empty";
+            idbEl.className = "diag-chip";
+          }
+        }
+
+        if (quotaEl) {
+          if (navigator.storage && typeof navigator.storage.estimate === "function") {
+            try {
+              const est = await navigator.storage.estimate();
+              quotaEl.textContent = "Depolama: " + formatBytes(est.usage || 0) + " / " + formatBytes(est.quota || 0);
+              quotaEl.className = "diag-chip ok";
+            } catch (e) {
+              quotaEl.textContent = "Depolama: Kısıtlı";
+              quotaEl.className = "diag-chip warn";
+            }
+          } else {
+            quotaEl.textContent = "Depolama: Standart";
+            quotaEl.className = "diag-chip";
+          }
+        }
+
+        if (cacheEl) {
+          try {
+            const cacheNames = window.caches ? await caches.keys() : [];
+            const swRegs = navigator.serviceWorker ? await navigator.serviceWorker.getRegistrations() : [];
+            cacheEl.textContent = "Önbellek: " + cacheNames.length + " Cache · " + swRegs.length + " SW";
+            cacheEl.className = "diag-chip " + (cacheNames.length > 0 || swRegs.length > 0 ? "ok" : "");
+          } catch (e) {
+            cacheEl.textContent = "Önbellek: Erişilemiyor";
+            cacheEl.className = "diag-chip warn";
+          }
+        }
+
+        if (localEl) {
+          try {
+            let ymCount = 0;
+            for (let i = 0; i < localStorage.length; i += 1) {
+              const k = localStorage.key(i) || "";
+              if (k.startsWith("ym4d_")) ymCount += 1;
+            }
+            localEl.textContent = "LocalStorage: " + ymCount + " / " + localStorage.length + " anahtar";
+            localEl.className = "diag-chip ok";
+          } catch (e) {
+            localEl.textContent = "LocalStorage: Kapalı";
+            localEl.className = "diag-chip warn";
           }
         }
       }
 
+      async function clearAssetCacheSafe() {
+        pauseCountdown("Önbellek temizlendi; kayıt veriniz korundu.");
+        const statusEl = document.getElementById("resetStatus");
+        let clearedCaches = 0;
+        let clearedSw = 0;
+        try {
+          if (window.caches) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+            clearedCaches = keys.length;
+          }
+          if (navigator.serviceWorker) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(function (r) { return r.unregister(); }));
+            clearedSw = regs.length;
+          }
+          if (statusEl) {
+            statusEl.textContent =
+              "Güvenli önbellek temizliği tamamlandı (" + clearedCaches + " cache, " + clearedSw + " service worker). /userfs kayıt veriniz korundu.";
+          }
+        } catch (e) {
+          if (statusEl) statusEl.textContent = "Önbellek temizleme sırasında tarayıcı kısıtlaması oluştu.";
+        }
+        inspectSaveTelemetry();
+      }
+
+      async function resetSaveDataConfirmed() {
+        const statusEl = document.getElementById("resetStatus");
+        const confirmBar = document.getElementById("saveResetConfirm");
+        try {
+          if (window.indexedDB) {
+            const toDelete = new Set(["/userfs"]);
+            if (typeof indexedDB.databases === "function") {
+              const dbs = await indexedDB.databases();
+              (dbs || []).forEach(function (d) {
+                if (d && d.name && (d.name.includes("userfs") || d.name.includes("godot"))) {
+                  toDelete.add(d.name);
+                }
+              });
+            }
+            await Promise.all(
+              Array.from(toDelete).map(function (name) {
+                return new Promise(function (resolve) {
+                  const req = indexedDB.deleteDatabase(name);
+                  req.onsuccess = resolve;
+                  req.onerror = resolve;
+                  req.onblocked = resolve;
+                });
+              })
+            );
+          }
+          try {
+            Object.keys(localStorage).forEach(function (k) {
+              if (k.startsWith("ym4d_")) localStorage.removeItem(k);
+            });
+          } catch (e) {}
+          if (confirmBar) confirmBar.classList.remove("open");
+          if (statusEl) statusEl.textContent = "Godot /userfs kayıt verisi ve profil tercihleri sıfırlandı.";
+        } catch (e) {
+          if (statusEl) statusEl.textContent = "Kayıt verisi sıfırlanırken hata oluştu.";
+        }
+        applyProfile("desktop", false);
+        inspectSaveTelemetry();
+      }
+
+      applyProfile(activeProfile, false);
       runDeviceDiagnostics();
+      inspectSaveTelemetry();
+
+      if (profileDesktopBtn) {
+        profileDesktopBtn.addEventListener("click", function () { applyProfile("desktop", true); });
+      }
+      if (profileTouchBtn) {
+        profileTouchBtn.addEventListener("click", function () { applyProfile("touch", true); });
+      }
+
+      const refreshBtn = document.getElementById("refreshTelemetry");
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", function () {
+          pauseCountdown("Telemetri yenilendi. Hazır olduğunuzda 'Hemen Oyna' düğmesine basın.");
+          inspectSaveTelemetry();
+        });
+      }
+      const clearCacheBtn = document.getElementById("clearCacheBtn");
+      if (clearCacheBtn) {
+        clearCacheBtn.addEventListener("click", clearAssetCacheSafe);
+      }
+      const resetSaveBtn = document.getElementById("resetSaveBtn");
+      const confirmBar = document.getElementById("saveResetConfirm");
+      const confirmResetBtn = document.getElementById("confirmResetSaveBtn");
+      const cancelResetBtn = document.getElementById("cancelResetSaveBtn");
+      if (resetSaveBtn && confirmBar) {
+        resetSaveBtn.addEventListener("click", function () {
+          pauseCountdown("Kayıt sıfırlama onayı bekleniyor...");
+          confirmBar.classList.toggle("open");
+        });
+      }
+      if (cancelResetBtn && confirmBar) {
+        cancelResetBtn.addEventListener("click", function () {
+          confirmBar.classList.remove("open");
+          const statusEl = document.getElementById("resetStatus");
+          if (statusEl) statusEl.textContent = "Kayıt sıfırlama iptal edildi.";
+        });
+      }
+      if (confirmResetBtn) {
+        confirmResetBtn.addEventListener("click", resetSaveDataConfirmed);
+      }
 
       function launch() {
-        window.location.replace(target);
+        window.location.replace(buildTargetUrl());
       }
 
       const interval = setInterval(function () {
         if (paused) return;
         remaining -= 1;
-        if (countEl) countEl.textContent = String(Math.max(0, remaining));
+        const ce = document.getElementById("countdown");
+        if (ce) ce.textContent = String(Math.max(0, remaining));
         if (remaining <= 0) {
           clearInterval(interval);
           launch();
@@ -327,8 +788,7 @@
       toggleBtn.addEventListener("click", function () {
         paused = !paused;
         if (paused) {
-          timerText.textContent = "Otomatik başlatma duraklatıldı. Hazır olduğunuzda 'Hemen Oyna' düğmesine basın.";
-          toggleBtn.textContent = "Sayacı Devam Ettir / Resume Auto-Launch";
+          pauseCountdown();
         } else {
           remaining = 3;
           timerText.innerHTML = 'Oyun <strong id="countdown">3</strong> saniye içinde otomatik başlatılıyor...';

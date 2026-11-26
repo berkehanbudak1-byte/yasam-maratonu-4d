@@ -144,6 +144,54 @@
       font-size: 0.84rem;
       color: var(--muted);
     }
+    .diag-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0 0 1.25rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(8, 13, 26, 0.72);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      align-items: center;
+      justify-content: space-between;
+    }
+    .diag-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .diag-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+    .diag-chip {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.22rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+    }
+    .diag-chip.ok {
+      color: #4ade80;
+      border-color: rgba(74, 222, 128, 0.4);
+      background: rgba(22, 101, 52, 0.25);
+    }
+    .diag-chip.warn {
+      color: var(--gold);
+      border-color: rgba(245, 185, 66, 0.45);
+      background: rgba(120, 53, 15, 0.25);
+    }
+    .diag-chip.err {
+      color: #f87171;
+      border-color: rgba(248, 113, 113, 0.45);
+      background: rgba(127, 29, 29, 0.28);
+    }
   </style>
 </head>
 <body>
@@ -156,6 +204,15 @@
     <p class="subtitle">
       4 Boyutlu Yaşam ve Zaman Maratonu Simülasyonu · 4D Life &amp; Time Marathon Simulation
     </p>
+
+    <div class="diag-bar" id="diagnosticsBadge" role="status" aria-live="polite">
+      <span class="diag-title">Sistem Hazırlık Tanısı / System Diagnostics</span>
+      <div class="diag-chips">
+        <span class="diag-chip" id="diagWebgl">WebGL2: Kontrol ediliyor...</span>
+        <span class="diag-chip" id="diagCpu">CPU: Kontrol ediliyor...</span>
+        <span class="diag-chip" id="diagAudio">Audio: Kontrol ediliyor...</span>
+      </div>
+    </div>
 
     <section class="controls-grid" aria-label="Kontroller / Controls">
       <div class="ctrl-box">
@@ -197,6 +254,61 @@
       const params = new URLSearchParams(window.location.search);
       let paused = params.get("stay") === "1";
       let remaining = 3;
+
+      function runDeviceDiagnostics() {
+        const webglEl = document.getElementById("diagWebgl");
+        const cpuEl = document.getElementById("diagCpu");
+        const audioEl = document.getElementById("diagAudio");
+
+        let hasWebgl2 = false;
+        try {
+          const canvas = document.createElement("canvas");
+          hasWebgl2 = !!(window.WebGL2RenderingContext && canvas.getContext("webgl2"));
+        } catch (e) {
+          hasWebgl2 = false;
+        }
+        if (webglEl) {
+          webglEl.textContent = hasWebgl2 ? "WebGL2: Hazır / Ready" : "WebGL2: Yok / Missing";
+          webglEl.className = "diag-chip " + (hasWebgl2 ? "ok" : "err");
+        }
+
+        const cores = Number(navigator.hardwareConcurrency || 0);
+        if (cpuEl) {
+          if (cores >= 4) {
+            cpuEl.textContent = "CPU: " + cores + " Çekirdek (Optimal)";
+            cpuEl.className = "diag-chip ok";
+          } else if (cores > 0) {
+            cpuEl.textContent = "CPU: " + cores + " Çekirdek (Standart)";
+            cpuEl.className = "diag-chip warn";
+          } else {
+            cpuEl.textContent = "CPU: Standart";
+            cpuEl.className = "diag-chip warn";
+          }
+        }
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (audioEl) {
+          if (AudioCtx) {
+            audioEl.textContent = "WebAudio: Hazır / Ready";
+            audioEl.className = "diag-chip ok";
+          } else {
+            audioEl.textContent = "WebAudio: Kısıtlı / Limited";
+            audioEl.className = "diag-chip warn";
+          }
+        }
+
+        if (!hasWebgl2) {
+          paused = true;
+          if (timerText) {
+            timerText.textContent = "Uyarı: Tarayıcınızda WebGL2 desteği algılanamadı. Otomatik başlatma duraklatıldı.";
+          }
+          if (toggleBtn) {
+            toggleBtn.textContent = "Sayacı Devam Ettir / Resume Auto-Launch";
+          }
+        }
+      }
+
+      runDeviceDiagnostics();
 
       function launch() {
         window.location.replace(target);

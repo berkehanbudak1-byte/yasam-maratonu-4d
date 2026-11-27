@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';" />
   <title>Yaşam Maratonu 4D — Hızlı Başlat / Quick Launch</title>
   <style>
     :root {
@@ -416,12 +418,26 @@
 
       let activeProfile = detectDefaultProfile();
 
+      function sanitizeHash(rawHash) {
+        if (typeof rawHash !== "string") return "";
+        return /^#[A-Za-z0-9_/-]{1,64}$/.test(rawHash) ? rawHash : "";
+      }
+
       function buildTargetUrl() {
-        const p = new URLSearchParams(window.location.search);
-        p.set("profile", activeProfile);
+        const src = new URLSearchParams(window.location.search);
+        const p = new URLSearchParams();
+        const allowedKeys = ["stay", "lang", "debug"];
+        for (let i = 0; i < allowedKeys.length; i += 1) {
+          const k = allowedKeys[i];
+          const v = src.get(k);
+          if (typeof v === "string" && /^[A-Za-z0-9_-]{1,32}$/.test(v)) {
+            p.set(k, v);
+          }
+        }
+        p.set("profile", activeProfile === "touch" ? "touch" : "desktop");
         p.set("touch", activeProfile === "touch" ? "1" : "0");
         const qs = p.toString();
-        return "./" + (qs ? "?" + qs : "") + window.location.hash;
+        return "./" + (qs ? "?" + qs : "") + sanitizeHash(window.location.hash);
       }
 
       function applyProfile(profile, userTriggered) {
@@ -513,8 +529,9 @@
       }
 
       function formatBytes(bytes) {
-        const n = Number(bytes || 0);
-        if (n < 1024) return n + " B";
+        const n = Number(bytes);
+        if (!Number.isFinite(n) || n <= 0) return "0 B";
+        if (n < 1024) return Math.floor(n) + " B";
         if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
         return (n / (1024 * 1024)).toFixed(2) + " MB";
       }
@@ -714,9 +731,14 @@
             );
           }
           try {
-            Object.keys(localStorage).forEach(function (k) {
-              if (k.startsWith("ym4d_")) localStorage.removeItem(k);
-            });
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i += 1) {
+              const k = localStorage.key(i);
+              if (k && k.startsWith("ym4d_")) keysToRemove.push(k);
+            }
+            for (let i = 0; i < keysToRemove.length; i += 1) {
+              localStorage.removeItem(keysToRemove[i]);
+            }
           } catch (e) {}
           if (confirmBar) confirmBar.classList.remove("open");
           if (statusEl) statusEl.textContent = "Godot /userfs kayıt verisi ve profil tercihleri sıfırlandı.";
@@ -770,6 +792,18 @@
         confirmResetBtn.addEventListener("click", resetSaveDataConfirmed);
       }
 
+      function renderCountdownNote(seconds) {
+        if (!timerText) return;
+        const strong = document.createElement("strong");
+        strong.id = "countdown";
+        strong.textContent = String(Math.max(0, Math.trunc(seconds)));
+        timerText.replaceChildren(
+          document.createTextNode("Oyun "),
+          strong,
+          document.createTextNode(" saniye içinde otomatik başlatılıyor...")
+        );
+      }
+
       function launch() {
         window.location.replace(buildTargetUrl());
       }
@@ -791,7 +825,7 @@
           pauseCountdown();
         } else {
           remaining = 3;
-          timerText.innerHTML = 'Oyun <strong id="countdown">3</strong> saniye içinde otomatik başlatılıyor...';
+          renderCountdownNote(remaining);
           toggleBtn.textContent = "Otomatik Başlatmayı Durdur / Pause Auto-Launch";
         }
       });

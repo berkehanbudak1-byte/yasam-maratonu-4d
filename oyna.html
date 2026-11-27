@@ -355,7 +355,7 @@
         <button type="button" class="btn-mini btn-danger" id="resetSaveBtn">Kayıt Verisini Sıfırla / Reset Save Data</button>
       </div>
       <div class="confirm-bar" id="saveResetConfirm" role="alert">
-        <span>Dikkat: Godot <code>/userfs</code> kayıt dosyaları kalıcı olarak silinecek. Emin misiniz?</span>
+        <span>Dikkat: Bu uygulamanın <code>ym4d_*</code> tercihleri ve aynı alan adındaki Godot Web oyunları tarafından paylaşılan <code>/userfs</code> IndexedDB kayıt dosyaları kalıcı olarak silinecek. Emin misiniz?</span>
         <button type="button" class="btn-mini btn-danger" id="confirmResetSaveBtn">Evet, Kaydı Sil / Confirm</button>
         <button type="button" class="btn-mini" id="cancelResetSaveBtn">İptal / Cancel</button>
       </div>
@@ -382,7 +382,7 @@
     </section>
 
     <div class="actions">
-      <a id="playNow" class="btn-play" href="./">▶ Hemen Oyna / Play Now</a>
+      <a id="playNow" class="btn-play" href="./index.html">▶ Hemen Oyna / Play Now</a>
       <button id="toggleTimer" type="button" class="btn-secondary">Otomatik Başlatmayı Durdur / Pause Auto-Launch</button>
     </div>
     <p id="timerText" class="timer-note">
@@ -393,6 +393,9 @@
   <script>
     (function () {
       const PROFILE_KEY = "ym4d_launch_profile";
+      const APP_STORAGE_PREFIXES = ["ym4d_", "yasam_maratonu_4d_"];
+      const APP_CACHE_PREFIXES = ["yasam-maratonu-4d", "yasam_maratonu_4d", "ym4d"];
+
       const playBtn = document.getElementById("playNow");
       const toggleBtn = document.getElementById("toggleTimer");
       const timerText = document.getElementById("timerText");
@@ -402,8 +405,67 @@
       const profileHint = document.getElementById("profileHint");
 
       const params = new URLSearchParams(window.location.search);
-      let paused = params.get("stay") === "1";
+      const stayRequested = params.get("stay") === "1";
+      let paused = stayRequested;
       let remaining = 3;
+
+      function getAppScopeUrl() {
+        try {
+          if (window.location && typeof window.location.href === "string" && window.location.href) {
+            return new URL("./", window.location.href).href;
+          }
+        } catch (e) {}
+        return "";
+      }
+
+      function getAppScopePath() {
+        const scopeUrl = getAppScopeUrl();
+        if (!scopeUrl) return "";
+        try {
+          return new URL(scopeUrl).pathname.toLowerCase();
+        } catch (e) {
+          return "";
+        }
+      }
+
+      function isOwnServiceWorker(reg) {
+        const appScope = getAppScopeUrl();
+        if (!appScope || !appScope.endsWith("/") || !reg || typeof reg.scope !== "string") {
+          return false;
+        }
+        const regScope = reg.scope.endsWith("/") ? reg.scope : reg.scope + "/";
+        return regScope === appScope || regScope.startsWith(appScope);
+      }
+
+      function isOwnCacheName(name) {
+        if (typeof name !== "string" || !name) return false;
+        const lower = name.toLowerCase();
+        const scopePath = getAppScopePath();
+        if (scopePath && scopePath.length > 1 && lower.includes(scopePath)) {
+          return true;
+        }
+        for (let i = 0; i < APP_CACHE_PREFIXES.length; i += 1) {
+          const prefix = APP_CACHE_PREFIXES[i];
+          if (
+            lower === prefix ||
+            lower.startsWith(prefix + "-") ||
+            lower.startsWith(prefix + "_") ||
+            lower.startsWith(prefix + ":") ||
+            lower.startsWith(prefix + "/")
+          ) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function isOwnStorageKey(key) {
+        if (typeof key !== "string" || !key) return false;
+        for (let i = 0; i < APP_STORAGE_PREFIXES.length; i += 1) {
+          if (key.startsWith(APP_STORAGE_PREFIXES[i])) return true;
+        }
+        return false;
+      }
 
       function detectDefaultProfile() {
         const q = (params.get("profile") || "").toLowerCase();
@@ -437,7 +499,7 @@
         p.set("profile", activeProfile === "touch" ? "touch" : "desktop");
         p.set("touch", activeProfile === "touch" ? "1" : "0");
         const qs = p.toString();
-        return "./" + (qs ? "?" + qs : "") + sanitizeHash(window.location.hash);
+        return "./index.html" + (qs ? "?" + qs : "") + sanitizeHash(window.location.hash);
       }
 
       function applyProfile(profile, userTriggered) {
@@ -653,8 +715,13 @@
 
         if (cacheEl) {
           try {
-            const cacheNames = window.caches ? await caches.keys() : [];
-            const swRegs = navigator.serviceWorker ? await navigator.serviceWorker.getRegistrations() : [];
+            const allCacheNames = window.caches ? await window.caches.keys() : [];
+            const cacheNames = allCacheNames.filter(isOwnCacheName);
+            const allSwRegs =
+              navigator.serviceWorker && typeof navigator.serviceWorker.getRegistrations === "function"
+                ? await navigator.serviceWorker.getRegistrations()
+                : [];
+            const swRegs = allSwRegs.filter(isOwnServiceWorker);
             cacheEl.textContent = "Önbellek: " + cacheNames.length + " Cache · " + swRegs.length + " SW";
             cacheEl.className = "diag-chip " + (cacheNames.length > 0 || swRegs.length > 0 ? "ok" : "");
           } catch (e) {
@@ -668,7 +735,7 @@
             let ymCount = 0;
             for (let i = 0; i < localStorage.length; i += 1) {
               const k = localStorage.key(i) || "";
-              if (k.startsWith("ym4d_")) ymCount += 1;
+              if (isOwnStorageKey(k)) ymCount += 1;
             }
             localEl.textContent = "LocalStorage: " + ymCount + " / " + localStorage.length + " anahtar";
             localEl.className = "diag-chip ok";
@@ -686,18 +753,20 @@
         let clearedSw = 0;
         try {
           if (window.caches) {
-            const keys = await caches.keys();
-            await Promise.all(keys.map(function (k) { return caches.delete(k); }));
+            const allKeys = await window.caches.keys();
+            const keys = allKeys.filter(isOwnCacheName);
+            await Promise.all(keys.map(function (k) { return window.caches.delete(k); }));
             clearedCaches = keys.length;
           }
-          if (navigator.serviceWorker) {
-            const regs = await navigator.serviceWorker.getRegistrations();
+          if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistrations === "function") {
+            const allRegs = await navigator.serviceWorker.getRegistrations();
+            const regs = allRegs.filter(isOwnServiceWorker);
             await Promise.all(regs.map(function (r) { return r.unregister(); }));
             clearedSw = regs.length;
           }
           if (statusEl) {
             statusEl.textContent =
-              "Güvenli önbellek temizliği tamamlandı (" + clearedCaches + " cache, " + clearedSw + " service worker). /userfs kayıt veriniz korundu.";
+              "Bu uygulama için güvenli önbellek temizliği tamamlandı (" + clearedCaches + " cache, " + clearedSw + " service worker). /userfs kayıt veriniz korundu.";
           }
         } catch (e) {
           if (statusEl) statusEl.textContent = "Önbellek temizleme sırasında tarayıcı kısıtlaması oluştu.";
@@ -711,10 +780,10 @@
         try {
           if (window.indexedDB) {
             const toDelete = new Set(["/userfs"]);
-            if (typeof indexedDB.databases === "function") {
-              const dbs = await indexedDB.databases();
+            if (typeof window.indexedDB.databases === "function") {
+              const dbs = await window.indexedDB.databases();
               (dbs || []).forEach(function (d) {
-                if (d && d.name && (d.name.includes("userfs") || d.name.includes("godot"))) {
+                if (d && d.name && (d.name === "/userfs" || isOwnCacheName(d.name))) {
                   toDelete.add(d.name);
                 }
               });
@@ -722,7 +791,7 @@
             await Promise.all(
               Array.from(toDelete).map(function (name) {
                 return new Promise(function (resolve) {
-                  const req = indexedDB.deleteDatabase(name);
+                  const req = window.indexedDB.deleteDatabase(name);
                   req.onsuccess = resolve;
                   req.onerror = resolve;
                   req.onblocked = resolve;
@@ -734,14 +803,14 @@
             const keysToRemove = [];
             for (let i = 0; i < localStorage.length; i += 1) {
               const k = localStorage.key(i);
-              if (k && k.startsWith("ym4d_")) keysToRemove.push(k);
+              if (isOwnStorageKey(k)) keysToRemove.push(k);
             }
             for (let i = 0; i < keysToRemove.length; i += 1) {
               localStorage.removeItem(keysToRemove[i]);
             }
           } catch (e) {}
           if (confirmBar) confirmBar.classList.remove("open");
-          if (statusEl) statusEl.textContent = "Godot /userfs kayıt verisi ve profil tercihleri sıfırlandı.";
+          if (statusEl) statusEl.textContent = "Bu uygulamanın ym4d_* tercihleri ve Godot /userfs kayıt verisi sıfırlandı.";
         } catch (e) {
           if (statusEl) statusEl.textContent = "Kayıt verisi sıfırlanırken hata oluştu.";
         }
@@ -750,6 +819,9 @@
       }
 
       applyProfile(activeProfile, false);
+      if (stayRequested) {
+        pauseCountdown("Otomatik başlatma duraklatıldı (?stay=1). Hazır olduğunuzda 'Hemen Oyna' düğmesine basın.");
+      }
       runDeviceDiagnostics();
       inspectSaveTelemetry();
 

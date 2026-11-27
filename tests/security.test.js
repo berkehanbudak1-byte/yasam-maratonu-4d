@@ -75,7 +75,12 @@ function runOynaLauncher(search, hash, options = {}) {
     createTextNode: (text) => ({ type: 'text', textContent: text })
   };
   const win = {
-    location: { search, hash, replace: (u) => { replacedUrl = u; } },
+    location: {
+      href: 'https://example.github.io/yasam-maratonu-4d/oyna.html' + search + hash,
+      search,
+      hash,
+      replace: (u) => { replacedUrl = u; }
+    },
     matchMedia: () => ({ matches: false }),
     WebGL2RenderingContext: function () {},
     AudioContext: function () {},
@@ -88,6 +93,7 @@ function runOynaLauncher(search, hash, options = {}) {
     document: doc,
     navigator: { hardwareConcurrency: 8 },
     localStorage: localStorageMock,
+    URL,
     URLSearchParams,
     setInterval: (fn) => { timers.push(fn); return timers.length; },
     clearInterval: () => {}
@@ -148,25 +154,25 @@ test('oyna.html allowlists URL query parameters and rejects unsafe hashes', () =
     '?profile=touch&stay=1&evil=<script>&redirect=https://evil.test&__proto__=polluted&lang=en',
     '#javascript:alert(1)'
   );
-  assert.equal(res.elements.get('playNow').getAttribute('href'), './?stay=1&lang=en&profile=touch&touch=1');
+  assert.equal(res.elements.get('playNow').getAttribute('href'), './index.html?stay=1&lang=en&profile=touch&touch=1');
 
   const res2 = runOynaLauncher('?profile=desktop&debug=1', '#hud/slot_2');
-  assert.equal(res2.elements.get('playNow').getAttribute('href'), './?debug=1&profile=desktop&touch=0#hud/slot_2');
+  assert.equal(res2.elements.get('playNow').getAttribute('href'), './index.html?debug=1&profile=desktop&touch=0#hud/slot_2');
 
   const res3 = runOynaLauncher('?profile=invalid', '#//evil.example');
-  assert.equal(res3.elements.get('playNow').getAttribute('href'), './?profile=desktop&touch=0');
+  assert.equal(res3.elements.get('playNow').getAttribute('href'), './index.html?profile=desktop&touch=0');
 });
 
 test('oyna.html handles tampered or throwing localStorage gracefully', async () => {
   const tampered = runOynaLauncher('', '', {
     storageSeed: { ym4d_launch_profile: '<img src=x onerror=1>' }
   });
-  assert.equal(tampered.elements.get('playNow').getAttribute('href'), './?profile=desktop&touch=0');
+  assert.equal(tampered.elements.get('playNow').getAttribute('href'), './index.html?profile=desktop&touch=0');
   assert.equal(tampered.store.get('ym4d_launch_profile'), 'desktop');
 
   const blocked = runOynaLauncher('?stay=1', '', { throwStorage: true });
   await new Promise((resolve) => setImmediate(resolve));
-  assert.equal(blocked.elements.get('playNow').getAttribute('href'), './?stay=1&profile=desktop&touch=0');
+  assert.equal(blocked.elements.get('playNow').getAttribute('href'), './index.html?stay=1&profile=desktop&touch=0');
   assert.equal(blocked.elements.get('telLocal').textContent, 'LocalStorage: Kapalı');
 });
 

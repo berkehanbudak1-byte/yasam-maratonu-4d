@@ -26,4 +26,4 @@ jobs:
           for f in tests/*.js tests/*.mjs; do node --check "$f"; done
 
       - name: Run unit and smoke tests
-        run: node --test tests/security.test.js tests/smoke.test.mjs
+        run: node --test tests/security.test.js tests/smoke.test.mjs tests/csp.test.mjs

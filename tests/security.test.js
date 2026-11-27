@@ -121,28 +121,32 @@ test('index.html enforces Referrer-Policy and Godot-WASM-compatible CSP with int
   assert.ok(cspMatch, 'index.html must include a CSP meta tag');
   const csp = cspMatch[1];
   assert.match(csp, /default-src\s+'self'/);
+  assert.doesNotMatch(csp, /script-src[^;]*'unsafe-inline'/);
+  assert.match(csp, /script-src[^;]*'sha256-[A-Za-z0-9+/]+=*'/);
   assert.match(csp, /'wasm-unsafe-eval'/);
   assert.match(csp, /worker-src\s+'self'\s+blob:/);
   assert.match(csp, /connect-src\s+'self'\s+blob:\s+data:/);
   assert.match(csp, /object-src\s+'none'/);
   assert.match(csp, /base-uri\s+'self'/);
-  assert.match(csp, /form-action\s+'self'/);
+  assert.match(csp, /form-action\s+'none'/);
   assert.match(html, /const GODOT_CONFIG = \{/);
   assert.match(html, /"index\.wasm":35376909/);
   assert.match(html, /"index\.pck":219648/);
 });
 
-test('oyna.html enforces Referrer-Policy, safe CSP, and contains zero unsafe HTML/eval sinks', () => {
+test('oyna.html enforces Referrer-Policy, strict hash-based CSP, and contains zero unsafe HTML/eval sinks', () => {
   const html = read('oyna.html');
   assert.match(html, /<meta\s+name="referrer"\s+content="no-referrer"\s*\/?>/i);
   const cspMatch = html.match(/<meta\s+http-equiv="Content-Security-Policy"\s+content="([^"]+)"\s*\/?>/i);
   assert.ok(cspMatch, 'oyna.html must include a CSP meta tag');
   const csp = cspMatch[1];
   assert.match(csp, /default-src\s+'self'/);
+  assert.doesNotMatch(csp, /script-src[^;]*'unsafe-inline'/);
+  assert.match(csp, /script-src[^;]*'sha256-[A-Za-z0-9+/]+=*'/);
   assert.doesNotMatch(csp, /'unsafe-eval'/);
   assert.match(csp, /object-src\s+'none'/);
   assert.match(csp, /base-uri\s+'self'/);
-  assert.match(csp, /form-action\s+'self'/);
+  assert.match(csp, /form-action\s+'none'/);
   assert.doesNotMatch(html, /\son(?:click|load|error|change|input|submit|keydown|keyup|mouseover)=/i);
 
   const forbidden = /\.(?:innerHTML|outerHTML)\s*=|\binsertAdjacentHTML\s*\(|\bdocument\.write\s*\(|\beval\s*\(|\bnew\s+Function\s*\(/;
